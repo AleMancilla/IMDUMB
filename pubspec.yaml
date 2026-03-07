@@ -91,3 +91,30 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  fonts:
+    - family: Junegull
+      fonts:
+        - asset: assets/fonts/junegull.ttf
+    - family: Typo Round
+      fonts:
+        - asset: assets/typo-round/Typo_Round_Thin_Demo.otf
+          weight: 100
+        - asset: assets/typo-round/Typo_Round_Thin_Italic Demo.otf
+          weight: 100
+          style: italic
+        - asset: assets/typo-round/Typo_Round_Light_Demo.otf
+          weight: 300
+        - asset: assets/typo-round/Typo_Round_Light_Italic_Demo.otf
+          weight: 300
+          style: italic
+        - asset: assets/typo-round/Typo_Round_Regular_Demo.otf
+          weight: 400
+        - asset: assets/typo-round/Typo_Round_Italic_Demo.otf
+          weight: 400
+          style: italic
+        - asset: assets/typo-round/Typo_Round_Bold_Demo.otf
+          weight: 700
+        - asset: assets/typo-round/Typo_Round_Bold_Italic_Demo.otf
+          weight: 700
+          style: italic
