@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_controller.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_state.dart';
+import 'package:imdumb/features/splash/presentation/widgets/animated_letter_text.dart';
+import 'package:imdumb/features/splash/presentation/widgets/pulse_background.dart';
 import 'package:imdumb/home_screen.dart';
-
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +14,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  bool _animationComplete = false;
 
   @override
   void initState() {
@@ -23,23 +25,47 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
   }
 
+  void _navigateIfReady() {
+    if (!mounted) return;
+    if (_animationComplete && ref.read(splashProvider) == SplashState.ready) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     ref.listen<SplashState>(splashProvider, (previous, next) {
-      if (next == SplashState.ready) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const HomeScreen(),
-          ),
-        );
-      }
+      if (next == SplashState.ready) _navigateIfReady();
     });
 
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                radius: 1.2,
+                colors: [Color(0xFF111827), Color(0xFF030712)],
+              ),
+            ),
+          ),
+
+          PulseBackground(),
+
+          Center(
+            child: AnimatedLetterText(
+              text: "IMDUMB",
+              onAnimationComplete: () async {
+                await Future.delayed(const Duration(seconds: 1));
+                setState(() => _animationComplete = true);
+                _navigateIfReady();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

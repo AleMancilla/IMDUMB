@@ -7,9 +7,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text(
-          "IMDUMB",
-          style: TextStyle(fontSize: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "IMDUMB",
+              style: TextStyle(fontSize: 80, fontFamily: 'Junegull'),
+            ),
+            Text("IMDUMB"),
+            Text("IMDUMB is a new way to watch movies and TV shows."),
+          ],
         ),
       ),
     );
