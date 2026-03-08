@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_controller.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_state.dart';
-import 'package:imdumb/features/splash/presentation/screens/animated_welcome_message.dart';
+import 'package:imdumb/features/splash/presentation/widgets/animated_welcome_message.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_letter_text.dart';
 import 'package:imdumb/features/splash/presentation/widgets/pulse_background.dart';
 import 'package:imdumb/home_screen.dart';

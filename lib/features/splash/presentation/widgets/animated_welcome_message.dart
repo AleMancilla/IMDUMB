@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:imdumb/features/splash/presentation/screens/splash_screen.dart';
 
 class AnimatedWelcomeMessage extends StatefulWidget {
   final String message;
 
-  const AnimatedWelcomeMessage({required this.message});
+  const AnimatedWelcomeMessage({super.key, required this.message});
 
   @override
   State<AnimatedWelcomeMessage> createState() =>

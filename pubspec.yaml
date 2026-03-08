@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^4.5.0
   firebase_remote_config: ^6.2.0
   shared_preferences: ^2.5.4
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:
