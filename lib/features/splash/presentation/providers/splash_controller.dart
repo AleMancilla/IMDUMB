@@ -10,7 +10,7 @@ final splashProvider =
 });
 
 class SplashController extends StateNotifier<SplashState> {
-  SplashController() : super(SplashState.loading);
+  SplashController() : super(SplashLoading());
 
   Future<void> initializeApp() async {
     try {
@@ -19,9 +19,9 @@ class SplashController extends StateNotifier<SplashState> {
       final message = remoteConfigService.getWelcomeMessage();
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("welcome_message", message);
-      state = SplashState.ready;
+      state = SplashReady(message);
     } catch (e) {
-      state = SplashState.error;
+      state = SplashError();
     }
   }
 }
