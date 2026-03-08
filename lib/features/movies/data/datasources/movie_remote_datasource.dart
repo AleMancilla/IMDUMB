@@ -7,6 +7,7 @@ abstract class MovieRemoteDatasource {
   Future<List<MovieModel>> getPopularMovies({int page = 1});
   Future<List<GenreModel>> getMovieGeneres();
   Future<List<MovieModel>> getNowPlayingMovies({int page = 1});
+  Future<List<MovieModel>> getMoviesByGenre(int genreId, {int page = 1});
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -53,6 +54,27 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
         .map(
           (movie) =>
               MovieModel.fromJson(movie as Map<String, dynamic>),
+        )
+        .toList();
+    return results;
+  }
+
+  @override
+  Future<List<MovieModel>> getMoviesByGenre(int genreId, {int page = 1}) async {
+    final response = await dio.get(
+      ApiConstants.discoverMovies,
+      queryParameters: {
+        "include_adult": false,
+        "include_video": true,
+        "language": "en-US",
+        "page": page,
+        "sort_by": "popularity.desc",
+        "with_genres": genreId,
+      },
+    );
+    final results = (response.data["results"] as List)
+        .map(
+          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
         )
         .toList();
     return results;

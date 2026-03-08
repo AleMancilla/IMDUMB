@@ -3,10 +3,12 @@ import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_card.dart';
 class MoviesHorizontalList extends StatelessWidget {
   final List<Movie> movies;
+  final String title;
 
   const MoviesHorizontalList({
     super.key,
     required this.movies,
+    this.title = 'En Tendencia',
   });
 
   @override
@@ -16,7 +18,7 @@ class MoviesHorizontalList extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'En Tendencia',
+          title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.bold,
