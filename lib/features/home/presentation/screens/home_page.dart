@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/movies/presentation/widgets/now_playing_carousel.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_letter_text.dart';
 
@@ -13,6 +14,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final movies = ref.watch(popularMoviesProvider(1));
     final generes = ref.watch(generesMoviesProvider);
+    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider(1));
 
     return CustomScaffold(
       appBar: Container(
@@ -36,6 +38,18 @@ class HomePage extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
+          nowPlayingMovies.when(
+            data: (list) => NowPlayingCarousel(movies: list),
+            loading: () => const SizedBox(
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => SizedBox(
+              height: 200,
+              child: Center(child: Text(e.toString(), style: const TextStyle(color: Colors.white))),
+            ),
+          ),
           generes.when(
             data: (genres) => SizedBox(
               height: 48,

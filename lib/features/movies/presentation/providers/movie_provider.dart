@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/core/network/dio_client.dart';
 import 'package:imdumb/features/movies/domain/usecases/get_generes_movies.dart';
+import 'package:imdumb/features/movies/domain/usecases/get_now_playing_movies.dart';
 
 import '../../data/datasources/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
@@ -31,6 +32,10 @@ final getGeneresMoviesProvider = Provider((ref) {
   return GetGeneresMovies(ref.read(movieRepositoryProvider));
 });
 
+final getNowPlayingMoviesProvider = Provider((ref) {
+  return GetNowPlayingMovies(ref.read(movieRepositoryProvider));
+});
+
 /// UI PROVIDERS
 final popularMoviesProvider = FutureProvider.family((ref, int page) async {
   final usecase = ref.read(getPopularMoviesProvider);
@@ -40,4 +45,9 @@ final popularMoviesProvider = FutureProvider.family((ref, int page) async {
 final generesMoviesProvider = FutureProvider((ref) async {
   final usecase = ref.read(getGeneresMoviesProvider);
   return usecase();
+});
+
+final nowPlayingMoviesProvider = FutureProvider.family((ref, int page) async {
+  final usecase = ref.read(getNowPlayingMoviesProvider);
+  return usecase(page: page);
 });
