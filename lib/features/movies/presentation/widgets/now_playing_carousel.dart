@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
-import 'package:imdumb/features/movies/domain/entities/movie_now_playing.dart';
+import 'package:imdumb/features/movies/domain/entities/movie.dart';
 
 class NowPlayingCarousel extends StatefulWidget {
-  final List<MovieNowPlaying> movies;
+  final List<Movie> movies;
 
   const NowPlayingCarousel({super.key, required this.movies});
 
@@ -61,7 +61,7 @@ class _NowPlayingCarouselState extends State<NowPlayingCarousel> {
         itemCount: widget.movies.length,
         itemBuilder: (context, index) {
           final movie = widget.movies[index];
-          final backdropUrl = movie.backdropPath != null && movie.backdropPath!.isNotEmpty
+          final backdropUrl = movie.backdropPath.isNotEmpty
               ? '${ApiConstants.baseBackdropUrl}${movie.backdropPath}'
               : null;
           return Padding(
@@ -103,7 +103,7 @@ class _NowPlayingCarouselState extends State<NowPlayingCarousel> {
                         ),
                       ),
                       child: Text(
-                        movie.title ?? '',
+                        movie.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

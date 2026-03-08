@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/data/models/movie_generes_model.dart';
-import 'package:imdumb/features/movies/data/models/movie_now_plaing.dart';
-import '../models/movie_popular_model.dart';
+import '../models/movie_model.dart';
 
 abstract class MovieRemoteDatasource {
-  Future<List<MoviePopularModel>> getPopularMovies({int page = 1});
+  Future<List<MovieModel>> getPopularMovies({int page = 1});
   Future<List<GenreModel>> getMovieGeneres();
-  Future<List<MovieNowPlayingModel>> getNowPlayingMovies({int page = 1});
+  Future<List<MovieModel>> getNowPlayingMovies({int page = 1});
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -17,7 +16,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
   MovieRemoteDatasourceImpl(this.dio);
 
   @override
-  Future<List<MoviePopularModel>> getPopularMovies({int page = 1}) async {
+  Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
 
     final response = await dio.get(
       ApiConstants.popularMovies,
@@ -29,7 +28,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
 
     final results = (response.data["results"] as List)
         .map(
-          (movie) => MoviePopularModel.fromJson(movie as Map<String, dynamic>),
+          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
         )
         .toList();
 
@@ -45,7 +44,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
     return results;
   }
   @override
-  Future<List<MovieNowPlayingModel>> getNowPlayingMovies({int page = 1}) async {
+  Future<List<MovieModel>> getNowPlayingMovies({int page = 1}) async {
     final response = await dio.get(
       ApiConstants.nowPlayingMovies,
       queryParameters: {"language": "es-ES", "page": page},
@@ -53,7 +52,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
     final results = (response.data["results"] as List)
         .map(
           (movie) =>
-              MovieNowPlayingModel.fromJson(movie as Map<String, dynamic>),
+              MovieModel.fromJson(movie as Map<String, dynamic>),
         )
         .toList();
     return results;

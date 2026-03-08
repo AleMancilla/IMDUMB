@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_card.dart';
 class MoviesHorizontalList extends StatelessWidget {
-  final List<MoviePopular> movies;
+  final List<Movie> movies;
 
   const MoviesHorizontalList({
     super.key,

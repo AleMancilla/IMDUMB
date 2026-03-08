@@ -5,7 +5,7 @@ import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 
 class MovieCard extends StatelessWidget {
-  final MoviePopular movie;
+  final Movie movie;
 
   const MovieCard({super.key, required this.movie});
 
