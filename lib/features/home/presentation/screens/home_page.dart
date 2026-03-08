@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_letter_text.dart';
 
 import '../../../movies/presentation/providers/movie_provider.dart';
 
 class HomePage extends ConsumerWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final movies = ref.watch(popularMoviesProvider(1));
@@ -67,25 +70,12 @@ class HomePage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(
-            child: movies.when(
+          movies.when(
               data: (movies) {
-                return ListView.builder(
-                  itemCount: movies.length,
-                  itemBuilder: (_, index) {
-                    final movie = movies[index];
-                    return ListTile(
-                      title: Text(
-                        movie.title,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                  },
-                );
+              return MoviesHorizontalList(movies: movies);
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(e.toString())),
-            ),
           ),
         ],
       ),
