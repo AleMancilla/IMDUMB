@@ -1,11 +1,11 @@
 import '../entities/movie.dart';
 import '../repositories/movie_repository.dart';
 
-class GetMovies {
+class GetPopularMovies {
 
   final MovieRepository repository;
 
-  GetMovies(this.repository);
+  GetPopularMovies(this.repository);
 
   Future<List<Movie>> call({int page = 1}) {
     return repository.getPopularMovies(page: page);

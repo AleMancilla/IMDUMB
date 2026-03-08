@@ -1,27 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/core/network/dio_client.dart';
+import 'package:imdumb/features/movies/domain/usecases/get_generes_movies.dart';
 
-import '../../domain/usecases/get_popular_movies.dart';
-import '../../data/repositories/movie_repository_impl.dart';
 import '../../data/datasources/movie_remote_datasource.dart';
+import '../../data/repositories/movie_repository_impl.dart';
+import '../../domain/usecases/get_popular_movies.dart';
+
+/// DIO
 
 final dioProvider = Provider((ref) {
   return DioClient().dio;
 });
 
+/// DATASOURCE
 final movieDatasourceProvider = Provider((ref) {
   return MovieRemoteDatasourceImpl(ref.read(dioProvider));
 });
 
+/// REPOSITORY
 final movieRepositoryProvider = Provider((ref) {
   return MovieRepositoryImpl(ref.read(movieDatasourceProvider));
 });
 
+/// USECASES
 final getPopularMoviesProvider = Provider((ref) {
-  return GetMovies(ref.read(movieRepositoryProvider));
+  return GetPopularMovies(ref.read(movieRepositoryProvider));
 });
 
-final popularMoviesProvider = FutureProvider((ref) async {
+final getGeneresMoviesProvider = Provider((ref) {
+  return GetGeneresMovies(ref.read(movieRepositoryProvider));
+});
+
+/// UI PROVIDERS
+final popularMoviesProvider = FutureProvider.family((ref, int page) async {
   final usecase = ref.read(getPopularMoviesProvider);
+  return usecase(page: page);
+});
+
+final generesMoviesProvider = FutureProvider((ref) async {
+  final usecase = ref.read(getGeneresMoviesProvider);
   return usecase();
 });

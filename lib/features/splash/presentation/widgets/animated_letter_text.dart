@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class AnimatedLetterText extends StatefulWidget {
   final String text;
   final VoidCallback? onAnimationComplete;
+  final double fontSize;
 
   const AnimatedLetterText({
     super.key,
     required this.text,
     this.onAnimationComplete,
+    this.fontSize = 80,
   });
 
   @override
@@ -51,19 +53,19 @@ class _AnimatedLetterTextState extends State<AnimatedLetterText>
           0.0,
           1.0,
         );
-
+    
         final animation = CurvedAnimation(
           parent: _controller,
           curve: Interval(start, end, curve: Curves.easeOutBack),
         );
-
+    
         final slideAnimation = Tween<Offset>(
           begin: const Offset(0, 1),
           end: Offset.zero,
         ).animate(animation);
-
+    
         final textColor = index < 2 ? Colors.orange : Colors.white;
-
+    
         return FadeTransition(
           opacity: animation,
           child: SlideTransition(
@@ -71,7 +73,7 @@ class _AnimatedLetterTextState extends State<AnimatedLetterText>
             child: Text(
               letters[index],
               style: TextStyle(
-                fontSize: 80,
+                fontSize: widget.fontSize,
                 fontFamily: 'Junegull',
                 fontWeight: FontWeight.bold,
                 color: textColor,
