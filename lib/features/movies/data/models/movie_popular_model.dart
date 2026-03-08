@@ -4,27 +4,27 @@
 
 import 'dart:convert';
 
-MoviePageModel moviePageModelFromJson(String str) =>
-    MoviePageModel.fromJson(json.decode(str));
+MoviePopularPageModel moviePageModelFromJson(String str) =>
+    MoviePopularPageModel.fromJson(json.decode(str));
 
-String moviePageModelToJson(MoviePageModel data) => json.encode(data.toJson());
+String moviePageModelToJson(MoviePopularPageModel data) => json.encode(data.toJson());
 
-class MoviePageModel {
+class MoviePopularPageModel {
   int? page;
-  List<MovieModel>? movies;
+  List<MoviePopularModel>? movies;
   int? totalPages;
   int? totalResults;
 
-  MoviePageModel({
+  MoviePopularPageModel({
         this.page, this.movies, this.totalPages, this.totalResults,
     });
 
-  factory MoviePageModel.fromJson(Map<String, dynamic> json) => MoviePageModel(
+  factory MoviePopularPageModel.fromJson(Map<String, dynamic> json) => MoviePopularPageModel(
         page: json["page"],
     movies: json["results"] == null
         ? []
-        : List<MovieModel>.from(
-            json["results"]!.map((x) => MovieModel.fromJson(x)),
+        : List<MoviePopularModel>.from(
+            json["results"]!.map((x) => MoviePopularModel.fromJson(x)),
           ),
         totalPages: json["total_pages"],
         totalResults: json["total_results"],
@@ -40,7 +40,7 @@ class MoviePageModel {
     };
 }
 
-class MovieModel {
+class MoviePopularModel {
   bool? adult;
   String? backdropPath;
   List<int>? genreIds;
@@ -56,7 +56,7 @@ class MovieModel {
   double? voteAverage;
   int? voteCount;
 
-  MovieModel({
+  MoviePopularModel({
     this.adult,
     this.backdropPath,
     this.genreIds,
@@ -73,7 +73,8 @@ class MovieModel {
     this.voteCount,
     });
 
-  factory MovieModel.fromJson(Map<String, dynamic> json) => MovieModel(
+  factory MoviePopularModel.fromJson(Map<String, dynamic> json) =>
+      MoviePopularModel(
         adult: json["adult"],
         backdropPath: json["backdrop_path"],
     genreIds: json["genre_ids"] == null

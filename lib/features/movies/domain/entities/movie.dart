@@ -1,10 +1,10 @@
-class MoviePage {
+class MoviePopularPage {
   int page;
-  List<Movie> movies;
+  List<MoviePopular> movies;
   int totalPages;
   int totalResults;
 
-  MoviePage({
+  MoviePopularPage({
     required this.page,
     required this.movies,
     required this.totalPages,
@@ -12,7 +12,7 @@ class MoviePage {
   });
 }
 
-class Movie {
+class MoviePopular {
     bool adult;
     String backdropPath;
     List<int> genreIds;
@@ -28,7 +28,7 @@ class Movie {
     double voteAverage;
     int voteCount;
 
-    Movie({
+  MoviePopular({
         required this.adult,
         required this.backdropPath,
         required this.genreIds,

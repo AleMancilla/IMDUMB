@@ -1,10 +1,10 @@
-import 'package:imdumb/features/movies/data/models/movie_model.dart';
+import 'package:imdumb/features/movies/data/models/movie_popular_model.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 
-extension MovieMapper on MovieModel {
+extension MovieMapper on MoviePopularModel {
 
-  Movie toEntity() {
-    return Movie(
+  MoviePopular toEntity() {
+    return MoviePopular(
       adult: adult ?? false,
       backdropPath: backdropPath ?? '',
       genreIds: genreIds ?? [],

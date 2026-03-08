@@ -14,7 +14,7 @@ class MovieRepositoryImpl implements MovieRepository {
   MovieRepositoryImpl(this.remoteDatasource);
 
   @override
-  Future<List<Movie>> getPopularMovies({int page = 1}) async {
+  Future<List<MoviePopular>> getPopularMovies({int page = 1}) async {
     final movies = await remoteDatasource.getPopularMovies(page: page);
 
     return movies.map((movie) => movie.toEntity()).toList();
