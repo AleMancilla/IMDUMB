@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:imdumb/features/movies/presentation/screens/home_page.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_controller.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_state.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_welcome_message.dart';
@@ -32,7 +33,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (_animationComplete && splashState is SplashReady) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => HomePage()),
       );
     }
   }
