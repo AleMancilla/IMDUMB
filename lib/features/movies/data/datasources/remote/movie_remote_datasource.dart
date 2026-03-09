@@ -4,7 +4,7 @@ import 'package:imdumb/features/movies/data/models/movie_credits_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_details_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_generes_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_reviews_model.dart';
-import '../models/movie_model.dart';
+import 'package:imdumb/features/movies/data/models/movie_model.dart';
 
 abstract class MovieRemoteDatasource {
   Future<List<MovieModel>> getPopularMovies({int page = 1});
