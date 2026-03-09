@@ -4,6 +4,8 @@ import 'package:imdumb/features/home/presentation/screens/home_page.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
 import 'package:imdumb/features/onboarding/data/onboarding_storage.dart';
 import 'package:imdumb/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:imdumb/features/profile/data/profile_storage.dart';
+import 'package:imdumb/features/profile/presentation/screens/profile_setup_screen.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_controller.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_state.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_welcome_message.dart';
@@ -36,13 +38,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!_animationComplete || splashState is! SplashReady) return;
     final completedOnboarding = await OnboardingStorage.hasCompleted();
     if (!mounted) return;
+    Widget nextScreen = const OnboardingScreen();
+    if (completedOnboarding) {
+      final hasProfile = await ProfileStorage.hasCompleted();
+      if (!mounted) return;
+      nextScreen = hasProfile ? const HomePage() : const ProfileSetupScreen();
+    }
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => completedOnboarding
-            ? const HomePage()
-            : const OnboardingScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => nextScreen),
     );
   }
 

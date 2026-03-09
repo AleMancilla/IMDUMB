@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
-import 'package:imdumb/features/home/presentation/screens/home_page.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 import 'package:imdumb/features/onboarding/data/onboarding_storage.dart';
+import 'package:imdumb/features/profile/presentation/screens/profile_setup_screen.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -60,7 +60,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const HomePage()),
+      MaterialPageRoute(builder: (_) => const ProfileSetupScreen()),
     );
   }
 
@@ -120,7 +120,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                                 'assets/images/categorias_image.png',
                                 width: double.infinity,
                                 fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => Icon(
+                                errorBuilder: (_, _, _) => Icon(
                                   page.icon,
                                   size: 80,
                                   color: Colors.white.withValues(alpha: 0.9),
@@ -317,7 +317,7 @@ class _AnimatedMovieStrip extends StatelessWidget {
           ),
         ),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -340,7 +340,7 @@ class _AnimatedMovieStrip extends StatelessWidget {
                   ? Image.network(
                       url,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _placeholder(),
+                      errorBuilder: (_, _, _) => _placeholder(),
                     )
                   : _placeholder(),
             ),
