@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/profile/data/profile_storage.dart';
+import 'package:imdumb/features/profile/presentation/screens/favorites_screen.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -67,7 +68,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _ProfileTile(
             icon: Icons.favorite_border,
             title: 'Favoritos',
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const FavoritesScreen(),
+                ),
+              );
+            },
           ),
           _ProfileTile(
             icon: Icons.settings_outlined,
