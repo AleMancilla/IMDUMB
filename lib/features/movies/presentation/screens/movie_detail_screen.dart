@@ -233,7 +233,14 @@ class MovieDetailScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        error: (_, _) => const SizedBox.shrink(),
+                        error: (e, stack) => Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: _SimilarMoviesError(
+                            error: e,
+                            onRetry: () =>
+                                ref.invalidate(similarMoviesProvider(movie.id)),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -332,6 +339,60 @@ class _MovieDetailsSection extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _SimilarMoviesError extends StatelessWidget {
+  final Object error;
+  final VoidCallback onRetry;
+
+  const _SimilarMoviesError({required this.error, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Películas similares',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.red.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                error.toString(),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh, size: 18, color: Colors.white),
+                label: const Text(
+                  'Reintentar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

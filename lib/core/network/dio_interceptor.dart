@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -15,10 +16,31 @@ class AppDioInterceptor extends Interceptor {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${ApiConstants.apiKey}',
-
     });
 
+    log(
+      '📋 cURL ============================================\n${_buildCurl(options)}\n____________________________________________',
+    );
     handler.next(options);
+  }
+
+  String _buildCurl(RequestOptions options) {
+    final buffer = StringBuffer();
+    buffer.write("curl -X ${options.method}");
+    buffer.write(" '${options.uri}'");
+    for (final entry in options.headers.entries) {
+      final value = entry.value;
+      if (value != null) {
+        buffer.write(" \\\n  -H '${entry.key}: $value'");
+      }
+    }
+    if (options.data != null) {
+      final data = options.data is String
+          ? options.data as String
+          : jsonEncode(options.data);
+      buffer.write(" \\\n  --data-raw '$data'");
+    }
+    return '$buffer';
   }
 
   @override

@@ -16,29 +16,18 @@ abstract class MovieRemoteDatasource {
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
-
   final Dio dio;
 
   MovieRemoteDatasourceImpl(this.dio);
 
+
   @override
   Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
-
     final response = await dio.get(
       ApiConstants.popularMovies,
-      queryParameters: {
-        "language": "es-ES",
-        "page": page
-      },
+      queryParameters: {"language": "es-ES", "page": page},
     );
-
-    final results = (response.data["results"] as List)
-        .map(
-          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
-        )
-        .toList();
-
-    return results;
+    return _parseMovieList(response.data["results"]);
   }
 
   @override
@@ -47,24 +36,16 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
       ApiConstants.movieGeneres,
       queryParameters: {"language": "es-ES"},
     );
-    final results = (response.data["genres"] as List)
-        .map((genre) => GenreModel.fromJson(genre as Map<String, dynamic>))
-        .toList();
-    return results;
+    return _parseGenreList(response.data["genres"]);
   }
+
   @override
   Future<List<MovieModel>> getNowPlayingMovies({int page = 1}) async {
     final response = await dio.get(
       ApiConstants.nowPlayingMovies,
       queryParameters: {"language": "es-ES", "page": page},
     );
-    final results = (response.data["results"] as List)
-        .map(
-          (movie) =>
-              MovieModel.fromJson(movie as Map<String, dynamic>),
-        )
-        .toList();
-    return results;
+    return _parseMovieList(response.data["results"]);
   }
 
   @override
@@ -80,12 +61,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
         "with_genres": genreId,
       },
     );
-    final results = (response.data["results"] as List)
-        .map(
-          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
-        )
-        .toList();
-    return results;
+    return _parseMovieList(response.data["results"]);
   }
 
   @override
@@ -112,11 +88,34 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
       ApiConstants.similarMovieUrl(movieId),
       queryParameters: {"language": "es-ES", "page": page},
     );
-    final results = (response.data["results"] as List)
-        .map(
-          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
-        )
-        .toList();
+    return _parseMovieList(response.data["results"]);
+  }
+
+  List<MovieModel> _parseMovieList(dynamic raw) {
+    if (raw == null || raw is! List) return [];
+    final List<MovieModel> results = [];
+    for (final item in raw) {
+      if (item is! Map<String, dynamic>) continue;
+      try {
+        results.add(MovieModel.fromJson(item));
+      } catch (_) {
+        // Ignorar items que no parsean
+      }
+    }
+    return results;
+  }
+
+  List<GenreModel> _parseGenreList(dynamic raw) {
+    if (raw == null || raw is! List) return [];
+    final List<GenreModel> results = [];
+    for (final item in raw) {
+      if (item is! Map<String, dynamic>) continue;
+      try {
+        results.add(GenreModel.fromJson(item));
+      } catch (_) {
+        // Ignorar items que no parsean
+      }
+    }
     return results;
   }
 }
