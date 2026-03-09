@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:imdumb/features/movies/presentation/widgets/similar_movies_error.dart';
+import 'package:imdumb/features/movies/presentation/widgets/reviews_section.dart';
+import 'package:imdumb/features/movies/presentation/widgets/credits_section.dart';
+import 'package:imdumb/features/movies/presentation/widgets/movie_details_section.dart';
+import 'package:imdumb/features/movies/presentation/widgets/action_chip.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
-import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
-import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
-import 'package:imdumb/features/movies/domain/entities/movie_reviews.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 import 'package:imdumb/features/profile/data/datasources/profile_firebase_datasource.dart';
@@ -181,7 +183,7 @@ class MovieDetailScreen extends ConsumerWidget {
                                 Row(
                                   spacing: 10,
                                   children: [
-                                    _ActionChip(
+                                    CustomActionChip(
                                       icon: isFavorite
                                           ? Icons.favorite
                                           : Icons.favorite_border,
@@ -195,7 +197,7 @@ class MovieDetailScreen extends ConsumerWidget {
                                           ? null
                                           : () => _toggleFavorite(ref),
                                     ),
-                                    _ActionChip(
+                                    CustomActionChip(
                                       icon: Icons.share_outlined,
                                       label: 'Compartir',
                                       color: Colors.white.withValues(
@@ -233,7 +235,7 @@ class MovieDetailScreen extends ConsumerWidget {
                       ],
                       detailsAsync.when(
                         data: (details) =>
-                            _MovieDetailsSection(details: details),
+                            MovieDetailsSection(details: details),
                         loading: () => const Padding(
                           padding: EdgeInsets.only(top: 16),
                           child: Center(
@@ -247,7 +249,7 @@ class MovieDetailScreen extends ConsumerWidget {
                         error: (_, _) => const SizedBox.shrink(),
                       ),
                       creditsAsync.when(
-                        data: (credits) => _CreditsSection(credits: credits),
+                        data: (credits) => CreditsSection(credits: credits),
                         loading: () => const Padding(
                           padding: EdgeInsets.only(top: 24),
                           child: Center(
@@ -282,7 +284,7 @@ class MovieDetailScreen extends ConsumerWidget {
                         ),
                         error: (e, stack) => Padding(
                           padding: const EdgeInsets.only(top: 24),
-                          child: _SimilarMoviesError(
+                          child: SimilarMoviesError(
                             error: e,
                             onRetry: () =>
                                 ref.invalidate(similarMoviesProvider(movie.id)),
@@ -290,7 +292,7 @@ class MovieDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       reviewsAsync.when(
-                        data: (reviews) => _ReviewsSection(reviews: reviews),
+                        data: (reviews) => ReviewsSection(reviews: reviews),
                         loading: () => const Padding(
                           padding: EdgeInsets.only(top: 24),
                           child: Center(
@@ -319,455 +321,6 @@ class MovieDetailScreen extends ConsumerWidget {
   }
 
   Color _ratingColor(double rating) {
-    if (rating >= 7.5) return Colors.green;
-    if (rating >= 6) return Colors.orange;
-    return Colors.red;
-  }
-}
-
-class _ActionChip extends StatelessWidget {
-  const _ActionChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-    this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: color),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MovieDetailsSection extends StatelessWidget {
-  final MovieDetails details;
-
-  const _MovieDetailsSection({required this.details});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasTagline = details.tagline != null && details.tagline!.isNotEmpty;
-    final hasRuntime = details.runtime != null && details.runtime! > 0;
-    final hasGenres = details.genres != null && details.genres!.isNotEmpty;
-    final hasStatus = details.status != null && details.status!.isNotEmpty;
-
-    if (!hasTagline && !hasRuntime && !hasGenres && !hasStatus) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (hasTagline) ...[
-            Text(
-              details.tagline!,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 15,
-                fontStyle: FontStyle.italic,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              if (hasRuntime)
-                _DetailChip(
-                  icon: Icons.schedule,
-                  label: '${details.runtime} min',
-                ),
-              if (hasStatus)
-                _DetailChip(icon: Icons.info_outline, label: details.status!),
-            ],
-          ),
-          if (hasGenres) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: details.genres!
-                  .map(
-                    (g) => Chip(
-                      label: Text(
-                        g.name,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                        ),
-                      ),
-                      backgroundColor: Colors.white24,
-                      side: BorderSide.none,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _SimilarMoviesError extends StatelessWidget {
-  final Object error;
-  final VoidCallback onRetry;
-
-  const _SimilarMoviesError({required this.error, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Películas similares',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.red.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                error.toString(),
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh, size: 18, color: Colors.white),
-                label: const Text(
-                  'Reintentar',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DetailChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _DetailChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white12,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white70),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CreditsSection extends StatelessWidget {
-  final MovieCredits credits;
-
-  const _CreditsSection({required this.credits});
-
-  @override
-  Widget build(BuildContext context) {
-    final cast = credits.cast ?? [];
-    if (cast.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Reparto',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: cast.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (_, index) {
-                final person = cast[index];
-                final profileUrl = person.profilePath != null &&
-                        person.profilePath!.isNotEmpty
-                    ? '${ApiConstants.baseImageUrl}${person.profilePath}'
-                    : null;
-                return SizedBox(
-                  width: 90,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: profileUrl != null
-                            ? Image.network(
-                                profileUrl,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => Image.asset(
-                                  'assets/images/imageNotFound.png',
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : Container(
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey.shade800,
-                                child: const Icon(
-                                  Icons.person,
-                                  color: Colors.white38,
-                                  size: 40,
-                                ),
-                              ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        person.name ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                      if (person.character != null &&
-                          person.character!.isNotEmpty)
-                        Text(
-                          person.character!,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontSize: 11,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReviewsSection extends StatelessWidget {
-  final List<MovieReview> reviews;
-
-  const _ReviewsSection({required this.reviews});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24, bottom: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Comentarios',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-          ),
-          const SizedBox(height: 12),
-          if (reviews.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.chat_bubble_outline,
-                    color: Colors.white.withValues(alpha: 0.5),
-                    size: 28,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'No hay comentarios para esta película',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            ...reviews.map(
-              (review) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.white24,
-                            child: Text(
-                              (review.author?.isNotEmpty == true
-                                      ? review.author!.substring(0, 1)
-                                      : '?')
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              review.author ?? 'Anónimo',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          if (review.authorDetails?.rating != null) ...[
-                            Icon(
-                              Icons.star,
-                              size: 16,
-                              color: _ratingColor(
-                                  review.authorDetails!.rating!.toDouble()),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${review.authorDetails!.rating}/10',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      if (review.content != null &&
-                          review.content!.isNotEmpty) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          review.content!,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 14,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  static Color _ratingColor(double rating) {
     if (rating >= 7.5) return Colors.green;
     if (rating >= 6) return Colors.orange;
     return Colors.red;
