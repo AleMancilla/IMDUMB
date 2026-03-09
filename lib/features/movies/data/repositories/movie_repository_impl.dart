@@ -116,4 +116,10 @@ class MovieRepositoryImpl implements MovieRepository {
     await _local.saveReviewsMovie(movieId, reviews);
     return reviews.map((r) => r.toEntity()).toList();
   }
+
+  @override
+  Future<List<Movie>> searchMovies(String query, {int page = 1}) async {
+    final movies = await _remote.searchMovies(query, page: page);
+    return movies.map((m) => m.toEntity()).toList();
+  }
 }

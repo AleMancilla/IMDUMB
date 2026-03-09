@@ -15,6 +15,7 @@ abstract class MovieRemoteDatasource {
   Future<MovieDetailsModel> getDetailsMovie(int movieId);
   Future<List<MovieModel>> getSimilarMovies(int movieId, {int page = 1});
   Future<List<MovieReviewModel>> getReviewsMovie(int movieId);
+  Future<List<MovieModel>> searchMovies(String query, {int page = 1});
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -102,6 +103,19 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
     return _parseMovieReviewList(response.data["results"]);
   }
 
+  @override
+  Future<List<MovieModel>> searchMovies(String query, {int page = 1}) async {
+    final response = await dio.get(
+      ApiConstants.searchMovies,
+      queryParameters: {
+        "query": query,
+        "include_adult": false,
+        "language": "es-ES",
+        "page": page,
+      },
+    );
+    return _parseMovieList(response.data["results"]);
+  }
 
   List<MovieModel> _parseMovieList(dynamic raw) {
     if (raw == null || raw is! List) return [];
