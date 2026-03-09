@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/home/presentation/screens/home_page.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/profile/data/datasources/profile_firebase_datasource.dart';
 import 'package:imdumb/features/profile/data/profile_storage.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
@@ -28,8 +29,21 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     if (name.isEmpty) return;
 
     setState(() => _isLoading = true);
-    await ProfileStorage.setDisplayName(name);
-    await ProfileStorage.markCompleted();
+    try {
+      await ProfileFirebaseDatasource.saveAlias(name);
+      await ProfileStorage.setDisplayName(name);
+      await ProfileStorage.markCompleted();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo guardar. Revisa la conexión e intenta de nuevo.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
     if (!mounted) return;
     setState(() => _isLoading = false);
     Navigator.pushReplacement(

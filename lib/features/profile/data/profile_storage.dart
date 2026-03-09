@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String _keyProfileCompleted = 'profile_completed';
 const String _keyDisplayName = 'display_name';
+const String _keyFirebaseUserId = 'firebase_user_id';
 
 abstract final class ProfileStorage {
   static Future<bool> hasCompleted() async {
@@ -14,9 +15,19 @@ abstract final class ProfileStorage {
     return prefs.getString(_keyDisplayName);
   }
 
+  static Future<String?> getFirebaseUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyFirebaseUserId);
+  }
+
   static Future<void> setDisplayName(String name) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyDisplayName, name.trim());
+  }
+
+  static Future<void> setFirebaseUserId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyFirebaseUserId, id);
   }
 
   static Future<void> markCompleted() async {
