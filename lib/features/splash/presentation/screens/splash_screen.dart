@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/home/presentation/screens/home_page.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/onboarding/data/onboarding_storage.dart';
+import 'package:imdumb/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_controller.dart';
 import 'package:imdumb/features/splash/presentation/providers/splash_state.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_welcome_message.dart';
@@ -28,15 +30,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
   }
 
-  void _navigateIfReady() {
+  Future<void> _navigateIfReady() async {
     if (!mounted) return;
     final splashState = ref.read(splashProvider);
-    if (_animationComplete && splashState is SplashReady) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage()),
-      );
-    }
+    if (!_animationComplete || splashState is! SplashReady) return;
+    final completedOnboarding = await OnboardingStorage.hasCompleted();
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => completedOnboarding
+            ? const HomePage()
+            : const OnboardingScreen(),
+      ),
+    );
   }
 
   @override
