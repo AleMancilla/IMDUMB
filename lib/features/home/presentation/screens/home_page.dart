@@ -48,10 +48,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               Expanded(
               child: AnimatedLetterText(
                 fontSize: 30,
-                text: "IMDUMB",
-                onAnimationComplete: () async {
-                  await Future.delayed(const Duration(seconds: 1));
-                },
+                text: 'IMDUMB',
+                repeat: true,
               ),
             ),
               Text(

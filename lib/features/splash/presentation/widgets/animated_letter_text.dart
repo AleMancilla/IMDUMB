@@ -4,12 +4,18 @@ class AnimatedLetterText extends StatefulWidget {
   final String text;
   final VoidCallback? onAnimationComplete;
   final double fontSize;
+  /// Si es true, la animación se repite en bucle.
+  final bool repeat;
+  /// Pausa entre la animación de entrada y la de salida (solo cuando [repeat] es true).
+  final Duration repeatHoldDuration;
 
   const AnimatedLetterText({
     super.key,
     required this.text,
     this.onAnimationComplete,
     this.fontSize = 80,
+    this.repeat = false,
+    this.repeatHoldDuration = const Duration(seconds: 5),
   });
 
   @override
@@ -20,6 +26,7 @@ class AnimatedLetterText extends StatefulWidget {
 class _AnimatedLetterTextState extends State<AnimatedLetterText>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  void Function(AnimationStatus)? _repeatStatusListener;
 
   @override
   void initState() {
@@ -29,9 +36,24 @@ class _AnimatedLetterTextState extends State<AnimatedLetterText>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _controller.forward().then((_) {
-      if (mounted) widget.onAnimationComplete?.call();
-    });
+    if (widget.repeat) {
+      _repeatStatusListener = (AnimationStatus status) {
+        if (!mounted) return;
+        if (status == AnimationStatus.completed) {
+          Future.delayed(widget.repeatHoldDuration, () {
+            if (mounted) _controller.reverse();
+          });
+        } else if (status == AnimationStatus.dismissed) {
+          _controller.forward();
+        }
+      };
+      _controller.addStatusListener(_repeatStatusListener!);
+      _controller.forward();
+    } else {
+      _controller.forward().then((_) {
+        if (mounted) widget.onAnimationComplete?.call();
+      });
+    }
   }
 
   @override
@@ -87,6 +109,9 @@ class _AnimatedLetterTextState extends State<AnimatedLetterText>
 
   @override
   void dispose() {
+    if (_repeatStatusListener != null) {
+      _controller.removeStatusListener(_repeatStatusListener!);
+    }
     _controller.dispose();
     super.dispose();
   }
