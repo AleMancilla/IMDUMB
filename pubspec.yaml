@@ -70,6 +70,7 @@ flutter:
     - .env.stage
     - .env.prod
     - assets/images/imageNotFound.png
+    - assets/images/categorias_image.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

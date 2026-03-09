@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/home/presentation/screens/home_page.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/movies/domain/entities/movie.dart';
+import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 import 'package:imdumb/features/onboarding/data/onboarding_storage.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
+    with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  late final AnimationController _scrollController;
+
+  /// Tamaño del poster en la primera pantalla (reemplaza al icono).
+  static const double _posterWidthFirstPage = 180.0;
+  static const double _posterSpacing = 12.0;
+  static const int _segmentDurationSeconds = 108;
 
   static const List<_OnboardingPage> _pages = [
     _OnboardingPage(
@@ -35,6 +46,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: _segmentDurationSeconds),
+    )..repeat();
+  }
+
   Future<void> _completeOnboarding() async {
     await OnboardingStorage.markCompleted();
     if (!mounted) return;
@@ -47,11 +67,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final popularAsync = ref.watch(popularMoviesProvider(1));
+
     return CustomScaffold(
       body: SafeArea(
         child: Column(
@@ -63,18 +86,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
                   final page = _pages[index];
-                  return Padding(
+                  return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 24),
-                        Icon(
-                          page.icon,
-                          size: 80,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                        const SizedBox(height: 48),
                         Text(
                           page.title,
                           textAlign: TextAlign.center,
@@ -86,6 +102,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
+                        if (index == 0) ...[
+                          const SizedBox(height: 16),
+                          _AnimatedMovieStrip(
+                            moviesAsync: popularAsync,
+                            animation: _scrollController,
+                            posterWidth: _posterWidthFirstPage,
+                            posterSpacing: _posterSpacing,
+                          ),
+                          const SizedBox(height: 40),
+                        ] else ...[
+                          const SizedBox(height: 24),
+                          if (index == 1)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                'assets/images/categorias_image.png',
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  page.icon,
+                                  size: 80,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                            )
+                          else
+                            Icon(
+                              page.icon,
+                              size: 80,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          const SizedBox(height: 48),
+                        ],
+                        const SizedBox(height: 24),
+                  
                         Text(
                           page.body,
                           textAlign: TextAlign.center,
@@ -95,6 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             height: 1.5,
                           ),
                         ),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   );
@@ -207,4 +259,105 @@ class _OnboardingPage {
     required this.body,
     required this.icon,
   });
+}
+
+class _AnimatedMovieStrip extends StatelessWidget {
+  const _AnimatedMovieStrip({
+    required this.moviesAsync,
+    required this.animation,
+    required this.posterWidth,
+    required this.posterSpacing,
+  });
+
+  final AsyncValue<List<Movie>> moviesAsync;
+  final AnimationController animation;
+  final double posterWidth;
+  final double posterSpacing;
+
+  @override
+  Widget build(BuildContext context) {
+    return moviesAsync.when(
+      data: (movies) {
+        if (movies.isEmpty) return const SizedBox.shrink();
+        final segmentWidth = movies.length * (posterWidth + posterSpacing);
+        return SizedBox(
+          height: posterWidth * 1.45,
+          child: ClipRect(
+            clipBehavior: Clip.hardEdge,
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              maxWidth: double.infinity,
+              child: AnimatedBuilder(
+                animation: animation,
+                builder: (context, _) {
+                  final offset = animation.value * segmentWidth;
+                  return Transform.translate(
+                    offset: Offset(-offset, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [_posterRow(movies), _posterRow(movies)],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => SizedBox(
+        height: posterWidth * 1.45,
+        child: Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
+          ),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _posterRow(List<Movie> movies) {
+    final baseUrl = ApiConstants.baseImageUrl;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: movies.map((movie) {
+        final url = movie.posterPath.isNotEmpty
+            ? '$baseUrl${movie.posterPath}'
+            : null;
+        return Container(
+          width: posterWidth + posterSpacing,
+          padding: EdgeInsets.only(right: posterSpacing),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: AspectRatio(
+              aspectRatio: 2 / 3,
+              child: url != null
+                  ? Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _placeholder(),
+                    )
+                  : _placeholder(),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      color: Colors.white.withValues(alpha: 0.1),
+      child: Icon(
+        Icons.movie_outlined,
+        color: Colors.white.withValues(alpha: 0.3),
+        size: posterWidth * 0.35,
+      ),
+    );
+  }
 }
