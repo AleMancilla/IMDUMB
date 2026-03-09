@@ -8,6 +8,7 @@ import 'package:imdumb/features/movies/domain/usecases/get_now_playing_movies.da
 import '../../data/datasources/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
 import '../../domain/usecases/get_credits_movie.dart';
+import '../../domain/usecases/get_details_movie.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 
 /// DIO
@@ -47,6 +48,10 @@ final getCreditsMovieProvider = Provider((ref) {
   return GetCreditsMovie(ref.read(movieRepositoryProvider));
 });
 
+final getDetailsMovieProvider = Provider((ref) {
+  return GetDetailsMovie(ref.read(movieRepositoryProvider));
+});
+
 /// UI PROVIDERS
 final popularMoviesProvider = FutureProvider.family((ref, int page) async {
   final usecase = ref.read(getPopularMoviesProvider);
@@ -63,9 +68,7 @@ final nowPlayingMoviesProvider = FutureProvider.family((ref, int page) async {
   return usecase(page: page);
 });
 
-/// Género seleccionado (null = mostrar populares)
 final selectedGenreIdProvider = StateProvider<int?>((ref) => null);
-
 final moviesByGenreProvider = FutureProvider.family((ref, int genreId) async {
   final usecase = ref.read(getMoviesByGenreProvider);
   return usecase(genreId: genreId, page: 1);
@@ -73,5 +76,10 @@ final moviesByGenreProvider = FutureProvider.family((ref, int genreId) async {
 
 final movieCreditsProvider = FutureProvider.family((ref, int movieId) async {
   final usecase = ref.read(getCreditsMovieProvider);
+  return usecase(movieId);
+});
+
+final movieDetailsProvider = FutureProvider.family((ref, int movieId) async {
+  final usecase = ref.read(getDetailsMovieProvider);
   return usecase(movieId);
 });

@@ -1,4 +1,5 @@
 import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
+import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_generes.dart';
 
 import '../../domain/entities/movie.dart';
@@ -7,6 +8,8 @@ import '../datasources/movie_remote_datasource.dart';
 import '../mappers/movie_generes_mapper.dart';
 import '../mappers/movie_mapper.dart';
 import '../mappers/movie_credits_mapper.dart';
+import '../mappers/movie_details_mapper.dart';
+
 
 class MovieRepositoryImpl implements MovieRepository {
   final MovieRemoteDatasource remoteDatasource;
@@ -41,5 +44,11 @@ class MovieRepositoryImpl implements MovieRepository {
   Future<MovieCredits> getCreditsMovie(int movieId) async {
     final credits = await remoteDatasource.getCreditsMovie(movieId);
     return credits.toEntity();
+  }
+
+  @override
+  Future<MovieDetails> getDetailsMovie(int movieId) async {
+    final details = await remoteDatasource.getDetailsMovie(movieId);
+    return details.toEntity();
   }
 }

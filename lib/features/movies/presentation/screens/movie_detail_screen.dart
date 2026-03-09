@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
+import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 
 class MovieDetailScreen extends ConsumerWidget {
@@ -13,6 +14,7 @@ class MovieDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final creditsAsync = ref.watch(movieCreditsProvider(movie.id));
+    final detailsAsync = ref.watch(movieDetailsProvider(movie.id));
     final backdropUrl = movie.backdropPath.isNotEmpty
         ? '${ApiConstants.baseBackdropUrl}${movie.backdropPath}'
         : null;
@@ -165,6 +167,21 @@ class MovieDetailScreen extends ConsumerWidget {
                           ),
                         ),
                       ],
+                      detailsAsync.when(
+                        data: (details) =>
+                            _MovieDetailsSection(details: details),
+                        loading: () => const Padding(
+                          padding: EdgeInsets.only(top: 16),
+                          child: Center(
+                            child: SizedBox(
+                              width: 28,
+                              height: 28,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        ),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
                       creditsAsync.when(
                         data: (credits) => _CreditsSection(credits: credits),
                         loading: () => const Padding(
@@ -198,6 +215,114 @@ class MovieDetailScreen extends ConsumerWidget {
     if (rating >= 7.5) return Colors.green;
     if (rating >= 6) return Colors.orange;
     return Colors.red;
+  }
+}
+
+class _MovieDetailsSection extends StatelessWidget {
+  final MovieDetails details;
+
+  const _MovieDetailsSection({required this.details});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasTagline = details.tagline != null && details.tagline!.isNotEmpty;
+    final hasRuntime = details.runtime != null && details.runtime! > 0;
+    final hasGenres = details.genres != null && details.genres!.isNotEmpty;
+    final hasStatus = details.status != null && details.status!.isNotEmpty;
+
+    if (!hasTagline && !hasRuntime && !hasGenres && !hasStatus) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasTagline) ...[
+            Text(
+              details.tagline!,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.85),
+                fontSize: 15,
+                fontStyle: FontStyle.italic,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (hasRuntime)
+                _DetailChip(
+                  icon: Icons.schedule,
+                  label: '${details.runtime} min',
+                ),
+              if (hasStatus)
+                _DetailChip(icon: Icons.info_outline, label: details.status!),
+            ],
+          ),
+          if (hasGenres) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: details.genres!
+                  .map(
+                    (g) => Chip(
+                      label: Text(
+                        g.name,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
+                      ),
+                      backgroundColor: Colors.white24,
+                      side: BorderSide.none,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _DetailChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white12,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white70),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -14,4 +14,7 @@ class ApiConstants {
   static const String nowPlayingMovies = '/movie/now_playing';
   static const String discoverMovies = '/discover/movie';
   static movieCreditlUrl(int movieId) => '/movie/$movieId/credits';
+
+  static movieDetailUrl(int movieId) =>
+      '/movie/$movieId&append_to_response=images';
 }
