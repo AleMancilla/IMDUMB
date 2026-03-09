@@ -7,6 +7,7 @@ import 'package:imdumb/features/movies/domain/usecases/get_now_playing_movies.da
 
 import '../../data/datasources/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
+import '../../domain/usecases/get_credits_movie.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 
 /// DIO
@@ -42,6 +43,10 @@ final getMoviesByGenreProvider = Provider((ref) {
   return GetMoviesByGenre(ref.read(movieRepositoryProvider));
 });
 
+final getCreditsMovieProvider = Provider((ref) {
+  return GetCreditsMovie(ref.read(movieRepositoryProvider));
+});
+
 /// UI PROVIDERS
 final popularMoviesProvider = FutureProvider.family((ref, int page) async {
   final usecase = ref.read(getPopularMoviesProvider);
@@ -64,4 +69,9 @@ final selectedGenreIdProvider = StateProvider<int?>((ref) => null);
 final moviesByGenreProvider = FutureProvider.family((ref, int genreId) async {
   final usecase = ref.read(getMoviesByGenreProvider);
   return usecase(genreId: genreId, page: 1);
+});
+
+final movieCreditsProvider = FutureProvider.family((ref, int movieId) async {
+  final usecase = ref.read(getCreditsMovieProvider);
+  return usecase(movieId);
 });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
+import 'package:imdumb/features/movies/presentation/screens/movie_detail_screen.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_card.dart';
 class MoviesHorizontalList extends StatelessWidget {
   final List<Movie> movies;
@@ -32,7 +33,17 @@ class MoviesHorizontalList extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             itemCount: movies.length,
             itemBuilder: (_, i) {
-              return MovieCard(movie: movies[i]);
+              final movie = movies[i];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => MovieDetailScreen(movie: movie),
+                    ),
+                  );
+                },
+                child: MovieCard(movie: movie),
+              );
             },
           ),
         ),

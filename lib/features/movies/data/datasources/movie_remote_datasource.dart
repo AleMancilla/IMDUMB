@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
+import 'package:imdumb/features/movies/data/models/movie_credits_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_generes_model.dart';
 import '../models/movie_model.dart';
 
@@ -8,6 +9,7 @@ abstract class MovieRemoteDatasource {
   Future<List<GenreModel>> getMovieGeneres();
   Future<List<MovieModel>> getNowPlayingMovies({int page = 1});
   Future<List<MovieModel>> getMoviesByGenre(int genreId, {int page = 1});
+  Future<MovieCreditsModel> getCreditsMovie(int movieId);
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -81,5 +83,14 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
         )
         .toList();
     return results;
+  }
+
+  @override
+  Future<MovieCreditsModel> getCreditsMovie(int movieId) async {
+    final response = await dio.get(
+      ApiConstants.movieCreditlUrl(movieId),
+      queryParameters: {"language": "es-ES"},
+    );
+    return MovieCreditsModel.fromJson(response.data);
   }
 }
