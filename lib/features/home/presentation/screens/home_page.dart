@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/home/presentation/widgets/custom_scaffold.dart';
+import 'package:imdumb/features/movies/domain/entities/movie_generes.dart';
 import 'package:imdumb/features/movies/presentation/widgets/now_playing_carousel.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 import 'package:imdumb/features/splash/presentation/widgets/animated_letter_text.dart';
@@ -12,18 +13,8 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedGenreId = ref.watch(selectedGenreIdProvider);
     final popularMovies = ref.watch(popularMoviesProvider(1));
-    final moviesByGenre = selectedGenreId != null
-        ? ref.watch(moviesByGenreProvider(selectedGenreId))
-        : null;
     final generes = ref.watch(generesMoviesProvider);
-    final selectedGenreName = generes.whenOrNull(
-      data: (genres) => genres
-          .where((g) => g.id == selectedGenreId)
-          .map((g) => g.name)
-          .firstOrNull,
-    );
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider(1));
 
     return CustomScaffold(
@@ -48,6 +39,7 @@ class HomePage extends ConsumerWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             nowPlayingMovies.when(
               data: (list) => NowPlayingCarousel(movies: list),
@@ -65,43 +57,29 @@ class HomePage extends ConsumerWidget {
                 ),
               ),
             ),
-            generes.when(
-              data: (genres) => SizedBox(
-                height: 48,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  itemCount: genres.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 8),
-                  itemBuilder: (_, index) {
-                    final genre = genres[index];
-                    final isSelected = selectedGenreId == genre.id;
-                    return ActionChip(
-                      color: Colors.transparent,
-                      label: Text(
-                        genre.name,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      backgroundColor: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.white24.withOpacity(0.4),
-                      side: BorderSide.none,
-                      onPressed: () {
-                        ref
-                            .read(selectedGenreIdProvider.notifier)
-                            .update(
-                              (current) =>
-                                  current == genre.id ? null : genre.id,
-                            );
-                      },
-                    );
-                  },
+            popularMovies.when(
+              data: (movies) => MoviesHorizontalList(
+                movies: movies,
+                title: 'En Tendencia',
+              ),
+              loading: () => const SizedBox(
+                height: 270,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  e.toString(),
+                  style: const TextStyle(color: Colors.white),
                 ),
+              ),
+            ),
+            generes.when(
+              data: (genres) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final genre in genres) GenreMovieSection(genre: genre),
+                ],
               ),
               loading: () => const SizedBox(
                 height: 48,
@@ -117,31 +95,73 @@ class HomePage extends ConsumerWidget {
                 ),
               ),
             ),
-            if (selectedGenreId != null && moviesByGenre != null)
-              moviesByGenre.when(
-                data: (movies) => MoviesHorizontalList(
-                  movies: movies,
-                  title: selectedGenreName ?? 'Por género',
-                ),
-                loading: () => const SizedBox(
-                  height: 270,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (e, _) => SizedBox(
-                  height: 80,
-                  child: Center(
-                    child: Text(
-                      e.toString(),
-                      style: const TextStyle(color: Colors.white),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class GenreMovieSection extends ConsumerWidget {
+  final Genre genre;
+
+  const GenreMovieSection({super.key, required this.genre});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final moviesByGenre = ref.watch(moviesByGenreProvider(genre.id));
+
+    return moviesByGenre.when(
+      data: (movies) => MoviesHorizontalList(
+        movies: movies,
+        title: genre.name,
+      ),
+      loading: () => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                genre.name,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ),
+              ),
+            ),
+            const SizedBox(
+              height: 270,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ],
+        ),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                genre.name,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+              ),
+            ),
+            SizedBox(
+              height: 80,
+              child: Center(
+                child: Text(
+                  e.toString(),
+                  style: const TextStyle(color: Colors.white54),
                 ),
               ),
-            popularMovies.when(
-              data: (movies) =>
-                  MoviesHorizontalList(movies: movies, title: 'En Tendencia'),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(e.toString())),
             ),
           ],
         ),

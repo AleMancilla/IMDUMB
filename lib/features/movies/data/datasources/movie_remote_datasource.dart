@@ -38,7 +38,10 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
 
   @override
   Future<List<GenreModel>> getMovieGeneres() async {
-    final response = await dio.get(ApiConstants.movieGeneres);
+    final response = await dio.get(
+      ApiConstants.movieGeneres,
+      queryParameters: {"language": "es-ES"},
+    );
     final results = (response.data["genres"] as List)
         .map((genre) => GenreModel.fromJson(genre as Map<String, dynamic>))
         .toList();
@@ -66,7 +69,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
       queryParameters: {
         "include_adult": false,
         "include_video": true,
-        "language": "en-US",
+        "language": "es-ES",
         "page": page,
         "sort_by": "popularity.desc",
         "with_genres": genreId,

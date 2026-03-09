@@ -18,18 +18,11 @@ class AppDioInterceptor extends Interceptor {
 
     });
 
-    log('➡️ REQUEST: ${options.method} ${options.uri}');
-    log('➡️ HEADERS: ${options.headers}');
-    log('➡️ QUERY: ${options.queryParameters}');
-    // log('➡️ DATA: ${options.data}');
-
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    log('✅ RESPONSE [${response.statusCode}]: ${response.requestOptions.uri}');
-    log('✅ DATA: ${response.data}');
     handler.next(response);
   }
 
