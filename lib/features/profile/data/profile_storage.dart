@@ -34,4 +34,11 @@ abstract final class ProfileStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyProfileCompleted, true);
   }
+
+  static Future<void> clearSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyProfileCompleted);
+    await prefs.remove(_keyDisplayName);
+    await prefs.remove(_keyFirebaseUserId);
+  }
 }

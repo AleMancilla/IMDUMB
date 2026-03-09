@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imdumb/features/profile/data/profile_storage.dart';
 import 'package:imdumb/features/profile/presentation/screens/favorites_screen.dart';
+import 'package:imdumb/features/profile/presentation/screens/profile_setup_screen.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -77,12 +78,47 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             },
           ),
           _ProfileTile(
-            icon: Icons.settings_outlined,
-            title: 'Ajustes',
-            onTap: () {},
+            icon: Icons.logout,
+            title: 'Cerrar sesión',
+            onTap: () => _showLogoutConfirmation(context),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showLogoutConfirmation(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1F2937),
+        title: const Text(
+          'Cerrar sesión',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Se cerrará tu sesión y deberás volver a introducir tu nombre o alias para entrar.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Cancelar', style: TextStyle(color: Colors.white70)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red.shade700),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    await ProfileStorage.clearSession();
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const ProfileSetupScreen()),
+      (_) => false,
     );
   }
 }
