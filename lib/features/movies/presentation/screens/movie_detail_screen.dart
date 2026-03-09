@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
@@ -18,6 +19,13 @@ class MovieDetailScreen extends ConsumerWidget {
   Future<void> _toggleFavorite(WidgetRef ref) async {
     await ProfileFirebaseDatasource.toggleFavorite(movie);
     ref.invalidate(favoriteIdsProvider);
+  }
+
+  void _shareMovie() {
+    final text = movie.overview.isNotEmpty
+        ? '${movie.title} (${movie.releaseDate.year})\n\n${movie.overview}'
+        : '${movie.title} (${movie.releaseDate.year})';
+    SharePlus.instance.share(ShareParams(subject: movie.title, text: text));
   }
 
   @override
@@ -56,18 +64,6 @@ class MovieDetailScreen extends ConsumerWidget {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.white,
-                    ),
-                    onPressed: favoriteIdsAsync.isLoading
-                        ? null
-                        : () => _toggleFavorite(ref),
-                    tooltip: isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos',
-                  ),
-                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: backdropUrl != null
                       ? Image.network(
@@ -178,6 +174,34 @@ class MovieDetailScreen extends ConsumerWidget {
                                         fontWeight: FontWeight.w600,
                                         fontFamily: 'Junegull',
                                       ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  spacing: 10,
+                                  children: [
+                                    _ActionChip(
+                                      icon: isFavorite
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      label: isFavorite
+                                          ? 'En favoritos'
+                                          : 'Favorito',
+                                      color: isFavorite
+                                          ? Colors.red
+                                          : Colors.white.withValues(alpha: 0.9),
+                                      onPressed: favoriteIdsAsync.isLoading
+                                          ? null
+                                          : () => _toggleFavorite(ref),
+                                    ),
+                                    _ActionChip(
+                                      icon: Icons.share_outlined,
+                                      label: 'Compartir',
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                      onPressed: _shareMovie,
                                     ),
                                   ],
                                 ),
@@ -298,6 +322,53 @@ class MovieDetailScreen extends ConsumerWidget {
     if (rating >= 7.5) return Colors.green;
     if (rating >= 6) return Colors.orange;
     return Colors.red;
+  }
+}
+
+class _ActionChip extends StatelessWidget {
+  const _ActionChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
