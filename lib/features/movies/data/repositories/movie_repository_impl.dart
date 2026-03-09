@@ -1,6 +1,7 @@
 import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_generes.dart';
+import 'package:imdumb/features/movies/domain/entities/movie_reviews.dart';
 
 import '../../domain/entities/movie.dart';
 import '../../domain/repositories/movie_repository.dart';
@@ -9,6 +10,7 @@ import '../mappers/movie_generes_mapper.dart';
 import '../mappers/movie_mapper.dart';
 import '../mappers/movie_credits_mapper.dart';
 import '../mappers/movie_details_mapper.dart';
+import '../mappers/movie_review_mapper.dart';
 
 
 class MovieRepositoryImpl implements MovieRepository {
@@ -56,5 +58,11 @@ class MovieRepositoryImpl implements MovieRepository {
   Future<List<Movie>> getSimilarMovies(int movieId, {int page = 1}) async {
     final movies = await remoteDatasource.getSimilarMovies(movieId, page: page);
     return movies.map((movie) => movie.toEntity()).toList();
+  }
+
+  @override
+  Future<List<MovieReview>> getReviewsMovie(int movieId) async {
+    final reviews = await remoteDatasource.getReviewsMovie(movieId);
+    return reviews.map((review) => review.toEntity()).toList();
   }
 }

@@ -17,4 +17,5 @@ class ApiConstants {
   static String movieDetailUrl(int movieId) =>
       '/movie/$movieId&append_to_response=images';
   static String similarMovieUrl(int movieId) => '/movie/$movieId/similar';
+  static String movieReviewsUrl(int movieId) => '/movie/$movieId/reviews';
 }

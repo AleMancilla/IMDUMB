@@ -3,6 +3,7 @@ import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/data/models/movie_credits_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_details_model.dart';
 import 'package:imdumb/features/movies/data/models/movie_generes_model.dart';
+import 'package:imdumb/features/movies/data/models/movie_reviews_model.dart';
 import '../models/movie_model.dart';
 
 abstract class MovieRemoteDatasource {
@@ -13,6 +14,7 @@ abstract class MovieRemoteDatasource {
   Future<MovieCreditsModel> getCreditsMovie(int movieId);
   Future<MovieDetailsModel> getDetailsMovie(int movieId);
   Future<List<MovieModel>> getSimilarMovies(int movieId, {int page = 1});
+  Future<List<MovieReviewModel>> getReviewsMovie(int movieId);
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -91,6 +93,16 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
     return _parseMovieList(response.data["results"]);
   }
 
+  @override
+  Future<List<MovieReviewModel>> getReviewsMovie(int movieId) async {
+    final response = await dio.get(
+      ApiConstants.movieReviewsUrl(movieId),
+      queryParameters: {"language": "es-ES"},
+    );
+    return _parseMovieReviewList(response.data["results"]);
+  }
+
+
   List<MovieModel> _parseMovieList(dynamic raw) {
     if (raw == null || raw is! List) return [];
     final List<MovieModel> results = [];
@@ -112,7 +124,22 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
       if (item is! Map<String, dynamic>) continue;
       try {
         results.add(GenreModel.fromJson(item));
-      } catch (_) {
+      } catch (e) {
+        // Ignorar items que no parsean
+      }
+    }
+    return results;
+  }
+
+  List<MovieReviewModel> _parseMovieReviewList(dynamic raw) {
+    if (raw == null || raw is! List) return [];
+    print("Raw reviews: $raw");
+    final List<MovieReviewModel> results = [];
+    for (final item in raw) {
+      if (item is! Map<String, dynamic>) continue;
+      try {
+        results.add(MovieReviewModel.fromJson(item));
+      } catch (e) {
         // Ignorar items que no parsean
       }
     }
