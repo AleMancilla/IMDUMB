@@ -1,5 +1,62 @@
 # IMDUMB - Flutter Mobile Developer Challenge
 
+---
+
+## Descarga (Android)
+
+Si tienes un dispositivo **Android**, puedes instalar la app directamente descargando el APK:
+
+**[⬇️ Descargar IMDUMB.apk](IMDUMB.apk)**
+
+> El archivo `IMDUMB.apk` está en la raíz del repositorio. Al abrir el enlace desde GitHub se iniciará la descarga. Luego permite la instalación desde orígenes desconocidos en tu dispositivo si te lo solicita.
+
+---
+
+## Capturas de pantalla
+
+<p align="center">
+  <strong>Splash</strong><br/>
+  <img src="screenshots/splash.png" width="220" alt="Splash"/>
+</p>
+
+<p align="center">
+  <strong>Onboarding</strong><br/>
+  <img src="screenshots/onboarding1.png" width="220" alt="Onboarding 1"/>
+  <img src="screenshots/onboarding2.png" width="220" alt="Onboarding 2"/>
+  <img src="screenshots/onboarding3.png" width="220" alt="Onboarding 3"/>
+</p>
+
+<p align="center">
+  <strong>Configuración de perfil (alias)</strong><br/>
+  <img src="screenshots/login.png" width="220" alt="Login"/>
+</p>
+
+<p align="center">
+  <strong>Home</strong><br/>
+  <img src="screenshots/home.png" width="220" alt="Home"/>
+</p>
+
+<p align="center">
+  <strong>Búsqueda</strong><br/>
+  <img src="screenshots/search.png" width="220" alt="Búsqueda"/>
+</p>
+
+<p align="center">
+  <strong>Detalle de película</strong><br/>
+  <img src="screenshots/movie_details.png" width="220" alt="Detalle"/>
+  <img src="screenshots/movie_details2.png" width="220" alt="Detalle 2"/>
+  <img src="screenshots/similar.png" width="220" alt="Similares"/>
+  <img src="screenshots/share.png" width="220" alt="Compartir"/>
+</p>
+
+<p align="center">
+  <strong>Perfil y Favoritos</strong><br/>
+  <img src="screenshots/profile.png" width="220" alt="Perfil"/>
+  <img src="screenshots/favorites.png" width="220" alt="Favoritos"/>
+</p>
+
+---
+
 ## 1. Descripción general del proyecto
 
 **IMDUMB** es una aplicación móvil en Flutter que permite explorar películas, ver categorías, detalles, reparto, reseñas y gestionar un perfil de usuario con datos sincronizados en Firebase.
@@ -206,39 +263,7 @@ Parámetros comunes: `language=es-ES`, `page` cuando aplica. Autenticación: `Au
 
 ---
 
-## 10. Capturas de pantalla
-
-### Splash
-![Splash](screenshots/splash.png)
-
-### Onboarding
-| Paso 1 | Paso 2 | Paso 3 |
-|--------|--------|--------|
-| ![Onboarding 1](screenshots/onboarding1.png) | ![Onboarding 2](screenshots/onboarding2.png) | ![Onboarding 3](screenshots/onboarding3.png) |
-
-### Configuración de perfil (alias)
-![Login / Alias](screenshots/login.png)
-
-### Home
-![Home](screenshots/home.png)
-
-### Búsqueda
-![Búsqueda](screenshots/search.png)
-
-### Detalle de película
-| Vista general | Similares / Compartir |
-|---------------|------------------------|
-| ![Detalle](screenshots/movie_details.png) | ![Detalle 2](screenshots/movie_details2.png) |
-| ![Similares](screenshots/similar.png) | ![Compartir](screenshots/share.png) |
-
-### Perfil y Favoritos
-| Perfil | Favoritos |
-|--------|-----------|
-| ![Perfil](screenshots/profile.png) | ![Favoritos](screenshots/favorites.png) |
-
----
-
-## 11. Consideraciones de rendimiento
+## 10. Consideraciones de rendimiento
 
 - **Caché con Hive**: Menos llamadas a la API; datos de listados y detalle reutilizados desde local.
 - **Listas**: Uso de `ListView.builder` / listas horizontales con ítems acotados (p. ej. `MovieCard`, `SearchMovieCard`) para no construir todos los hijos a la vez.
