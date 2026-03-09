@@ -6,11 +6,24 @@ import 'package:imdumb/features/movies/presentation/screens/movie_detail_screen.
 import 'package:imdumb/features/movies/presentation/widgets/search_movie_card.dart';
 import 'package:imdumb/features/profile/presentation/providers/favorite_movies_provider.dart';
 
-class FavoritesScreen extends ConsumerWidget {
+class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(favoriteMoviesProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final favoritesAsync = ref.watch(favoriteMoviesProvider);
 
     return CustomScaffold(
@@ -57,7 +70,7 @@ class FavoritesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildList(BuildContext context, List<Movie> movies) {
+  static Widget _buildList(BuildContext context, List<Movie> movies) {
     if (movies.isEmpty) {
       return Center(
         child: Column(

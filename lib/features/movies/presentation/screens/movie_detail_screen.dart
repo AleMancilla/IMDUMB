@@ -11,6 +11,7 @@ import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 import 'package:imdumb/features/profile/data/datasources/profile_firebase_datasource.dart';
+import 'package:imdumb/features/profile/presentation/providers/favorite_movies_provider.dart';
 import 'package:imdumb/features/profile/presentation/providers/favorites_provider.dart';
 
 class MovieDetailScreen extends ConsumerWidget {
@@ -21,6 +22,7 @@ class MovieDetailScreen extends ConsumerWidget {
   Future<void> _toggleFavorite(WidgetRef ref) async {
     await ProfileFirebaseDatasource.toggleFavorite(movie);
     ref.invalidate(favoriteIdsProvider);
+    ref.invalidate(favoriteMoviesProvider);
   }
 
   void _shareMovie() {
