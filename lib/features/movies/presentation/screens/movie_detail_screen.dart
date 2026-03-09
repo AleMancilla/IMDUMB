@@ -7,11 +7,18 @@ import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_reviews.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
 import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
+import 'package:imdumb/features/profile/data/datasources/profile_firebase_datasource.dart';
+import 'package:imdumb/features/profile/presentation/providers/favorites_provider.dart';
 
 class MovieDetailScreen extends ConsumerWidget {
   final Movie movie;
 
   const MovieDetailScreen({super.key, required this.movie});
+
+  Future<void> _toggleFavorite(WidgetRef ref) async {
+    await ProfileFirebaseDatasource.toggleFavorite(movie);
+    ref.invalidate(favoriteIdsProvider);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,6 +26,8 @@ class MovieDetailScreen extends ConsumerWidget {
     final detailsAsync = ref.watch(movieDetailsProvider(movie.id));
     final similarMoviesAsync = ref.watch(similarMoviesProvider(movie.id));
     final reviewsAsync = ref.watch(movieReviewsProvider(movie.id));
+    final favoriteIdsAsync = ref.watch(favoriteIdsProvider);
+    final isFavorite = favoriteIdsAsync.value?.contains(movie.id) ?? false;
     final backdropUrl = movie.backdropPath.isNotEmpty
         ? '${ApiConstants.baseBackdropUrl}${movie.backdropPath}'
         : null;
@@ -47,6 +56,18 @@ class MovieDetailScreen extends ConsumerWidget {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.white,
+                    ),
+                    onPressed: favoriteIdsAsync.isLoading
+                        ? null
+                        : () => _toggleFavorite(ref),
+                    tooltip: isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos',
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: backdropUrl != null
                       ? Image.network(

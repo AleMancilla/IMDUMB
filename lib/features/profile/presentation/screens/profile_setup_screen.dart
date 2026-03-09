@@ -30,9 +30,23 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await ProfileFirebaseDatasource.saveAlias(name);
+      final wasExistingUser = await ProfileFirebaseDatasource.saveAlias(name);
       await ProfileStorage.setDisplayName(name);
       await ProfileStorage.markCompleted();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      if (wasExistingUser) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Bienvenido de nuevo! Tus datos se han restaurado.'),
+            backgroundColor: Color(0xFF111827),
+          ),
+        );
+      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -42,14 +56,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           backgroundColor: Colors.red.shade700,
         ),
       );
-      return;
     }
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomePage()),
-    );
   }
 
   @override
