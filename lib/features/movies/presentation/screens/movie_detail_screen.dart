@@ -5,6 +5,7 @@ import 'package:imdumb/features/movies/domain/entities/movie.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_credits.dart';
 import 'package:imdumb/features/movies/domain/entities/movie_details.dart';
 import 'package:imdumb/features/movies/presentation/providers/movie_provider.dart';
+import 'package:imdumb/features/movies/presentation/widgets/movie_horizontal_list.dart';
 
 class MovieDetailScreen extends ConsumerWidget {
   final Movie movie;
@@ -15,6 +16,7 @@ class MovieDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final creditsAsync = ref.watch(movieCreditsProvider(movie.id));
     final detailsAsync = ref.watch(movieDetailsProvider(movie.id));
+    final similarMoviesAsync = ref.watch(similarMoviesProvider(movie.id));
     final backdropUrl = movie.backdropPath.isNotEmpty
         ? '${ApiConstants.baseBackdropUrl}${movie.backdropPath}'
         : null;
@@ -45,7 +47,14 @@ class MovieDetailScreen extends ConsumerWidget {
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: backdropUrl != null
-                      ? Image.network(backdropUrl, fit: BoxFit.cover)
+                      ? Image.network(
+                          backdropUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Image.asset(
+                            'assets/images/imageNotFound.png',
+                            fit: BoxFit.cover,
+                          ),
+                        )
                       : Container(
                           color: Colors.grey.shade900,
                           child: const Icon(
@@ -73,6 +82,12 @@ class MovieDetailScreen extends ConsumerWidget {
                                 width: 120,
                                 height: 180,
                                 fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => Image.asset(
+                                  'assets/images/imageNotFound.png',
+                                  width: 120,
+                                  height: 180,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             )
                           else
@@ -108,7 +123,9 @@ class MovieDetailScreen extends ConsumerWidget {
                                     child: Text(
                                       movie.originalTitle,
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.7),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         fontSize: 14,
                                       ),
                                     ),
@@ -117,7 +134,7 @@ class MovieDetailScreen extends ConsumerWidget {
                                 Text(
                                   _formatDate(movie.releaseDate),
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -161,7 +178,7 @@ class MovieDetailScreen extends ConsumerWidget {
                         Text(
                           movie.overview,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 15,
                             height: 1.5,
                           ),
@@ -180,7 +197,7 @@ class MovieDetailScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        error: (_, __) => const SizedBox.shrink(),
+                        error: (_, _) => const SizedBox.shrink(),
                       ),
                       creditsAsync.when(
                         data: (credits) => _CreditsSection(credits: credits),
@@ -195,6 +212,28 @@ class MovieDetailScreen extends ConsumerWidget {
                           ),
                         ),
                         error: (e, _) => const SizedBox.shrink(),
+                      ),
+                      similarMoviesAsync.when(
+                        data: (similarMovies) => similarMovies.isEmpty
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 24),
+                                child: MoviesHorizontalList(
+                                  movies: similarMovies,
+                                  title: 'Películas similares',
+                                ),
+                              ),
+                        loading: () => const Padding(
+                          padding: EdgeInsets.only(top: 24),
+                          child: Center(
+                            child: SizedBox(
+                              width: 32,
+                              height: 32,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        ),
+                        error: (_, _) => const SizedBox.shrink(),
                       ),
                     ],
                   ),
@@ -243,7 +282,7 @@ class _MovieDetailsSection extends StatelessWidget {
             Text(
               details.tagline!,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 15,
                 fontStyle: FontStyle.italic,
                 height: 1.4,
@@ -355,7 +394,7 @@ class _CreditsSection extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: cast.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (_, index) {
                 final person = cast[index];
                 final profileUrl = person.profilePath != null &&
@@ -375,6 +414,12 @@ class _CreditsSection extends StatelessWidget {
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => Image.asset(
+                                  'assets/images/imageNotFound.png',
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                ),
                               )
                             : Container(
                                 width: 80,
@@ -404,7 +449,7 @@ class _CreditsSection extends StatelessWidget {
                         Text(
                           person.character!,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 11,
                           ),
                           maxLines: 1,

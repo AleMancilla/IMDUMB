@@ -12,6 +12,7 @@ abstract class MovieRemoteDatasource {
   Future<List<MovieModel>> getMoviesByGenre(int genreId, {int page = 1});
   Future<MovieCreditsModel> getCreditsMovie(int movieId);
   Future<MovieDetailsModel> getDetailsMovie(int movieId);
+  Future<List<MovieModel>> getSimilarMovies(int movieId, {int page = 1});
 }
 
 class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
@@ -103,5 +104,19 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
       queryParameters: {"language": "es-ES"},
     );
     return MovieDetailsModel.fromJson(response.data);
+  }
+
+  @override
+  Future<List<MovieModel>> getSimilarMovies(int movieId, {int page = 1}) async {
+    final response = await dio.get(
+      ApiConstants.similarMovieUrl(movieId),
+      queryParameters: {"language": "es-ES", "page": page},
+    );
+    final results = (response.data["results"] as List)
+        .map(
+          (movie) => MovieModel.fromJson(movie as Map<String, dynamic>),
+        )
+        .toList();
+    return results;
   }
 }

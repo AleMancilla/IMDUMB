@@ -39,6 +39,12 @@ class MovieCard extends StatelessWidget {
                 height: 230,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Image.asset(
+                  'assets/images/imageNotFound.png',
+                  height: 230,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
 

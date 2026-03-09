@@ -51,4 +51,10 @@ class MovieRepositoryImpl implements MovieRepository {
     final details = await remoteDatasource.getDetailsMovie(movieId);
     return details.toEntity();
   }
+
+  @override
+  Future<List<Movie>> getSimilarMovies(int movieId, {int page = 1}) async {
+    final movies = await remoteDatasource.getSimilarMovies(movieId, page: page);
+    return movies.map((movie) => movie.toEntity()).toList();
+  }
 }

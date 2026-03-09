@@ -10,6 +10,7 @@ import '../../data/repositories/movie_repository_impl.dart';
 import '../../domain/usecases/get_credits_movie.dart';
 import '../../domain/usecases/get_details_movie.dart';
 import '../../domain/usecases/get_popular_movies.dart';
+import '../../domain/usecases/get_similar_movies.dart';
 
 /// DIO
 
@@ -52,6 +53,10 @@ final getDetailsMovieProvider = Provider((ref) {
   return GetDetailsMovie(ref.read(movieRepositoryProvider));
 });
 
+final getSimilarMoviesProvider = Provider((ref) {
+  return GetSimilarMovies(ref.read(movieRepositoryProvider));
+});
+
 /// UI PROVIDERS
 final popularMoviesProvider = FutureProvider.family((ref, int page) async {
   final usecase = ref.read(getPopularMoviesProvider);
@@ -82,4 +87,9 @@ final movieCreditsProvider = FutureProvider.family((ref, int movieId) async {
 final movieDetailsProvider = FutureProvider.family((ref, int movieId) async {
   final usecase = ref.read(getDetailsMovieProvider);
   return usecase(movieId);
+});
+
+final similarMoviesProvider = FutureProvider.family((ref, int movieId) async {
+  final usecase = ref.read(getSimilarMoviesProvider);
+  return usecase(movieId, page: 1);
 });
