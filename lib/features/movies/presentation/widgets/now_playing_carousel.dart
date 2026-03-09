@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:imdumb/core/constants/api_constants.dart';
 import 'package:imdumb/features/movies/domain/entities/movie.dart';
+import 'package:imdumb/features/movies/presentation/screens/movie_detail_screen.dart';
 
 class NowPlayingCarousel extends StatefulWidget {
   final List<Movie> movies;
@@ -64,57 +65,79 @@ class _NowPlayingCarouselState extends State<NowPlayingCarousel> {
           final backdropUrl = movie.backdropPath.isNotEmpty
               ? '${ApiConstants.baseBackdropUrl}${movie.backdropPath}'
               : null;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (backdropUrl != null)
-                    CachedNetworkImage(
-                      imageUrl: backdropUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => Container(
+          return InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => MovieDetailScreen(movie: movie),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (backdropUrl != null)
+                      CachedNetworkImage(
+                        imageUrl: backdropUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, _) => Container(
+                          color: Colors.grey.shade900,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (_, _, _) => Container(
+                          color: Colors.grey.shade900,
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.white54,
+                            size: 48,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
                         color: Colors.grey.shade900,
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                      errorWidget: (_, _, _) => Container(
-                        color: Colors.grey.shade900,
-                        child: const Icon(Icons.broken_image, color: Colors.white54, size: 48),
-                      ),
-                    )
-                  else
-                    Container(
-                      color: Colors.grey.shade900,
-                      child: const Icon(Icons.movie, color: Colors.white24, size: 48),
-                    ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, Colors.black.withValues(alpha: 0.85)],
+                        child: const Icon(
+                          Icons.movie,
+                          color: Colors.white24,
+                          size: 48,
                         ),
                       ),
-                      child: Text(
-                        movie.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.85),
+                            ],
+                          ),
+                        ),
+                        child: Text(
+                          movie.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

@@ -133,7 +133,6 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
 
   List<MovieReviewModel> _parseMovieReviewList(dynamic raw) {
     if (raw == null || raw is! List) return [];
-    print("Raw reviews: $raw");
     final List<MovieReviewModel> results = [];
     for (final item in raw) {
       if (item is! Map<String, dynamic>) continue;

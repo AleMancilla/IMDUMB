@@ -256,7 +256,7 @@ class MovieDetailScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        error: (_, __) => const SizedBox.shrink(),
+                        error: (_, _) => const SizedBox.shrink(),
                       ),
                     ],
                   ),
@@ -384,7 +384,7 @@ class _SimilarMoviesError extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.15),
+            color: Colors.red.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
